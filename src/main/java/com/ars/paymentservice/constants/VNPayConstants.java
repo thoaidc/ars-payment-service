@@ -19,6 +19,7 @@ public interface VNPayConstants {
     String VNP_SECURE_HASH_KEY = "vnp_SecureHash";
 
     // Default params value
+    int VNP_ROUNDING_FACTOR = 100;
     String VNP_COMMAND = "pay";
     String VNP_CURRENCY_CODE = "VND";
     String VNP_LOCALE_VN = "vn";

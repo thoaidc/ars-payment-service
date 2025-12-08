@@ -118,7 +118,7 @@ server:
         # Cookies will still be sent with each HTTP request (and can therefore be used for session authentication)
         # But Cookies cannot be accessed from the client side using JavaScript (e.g. via document.cookie)
         http-only: true
-  port: 8002
+  port: 8004
 
 # Eureka client configuration
 eureka:
@@ -214,8 +214,8 @@ app:
         - file:D:\Workspaces\Projects\PTIT\ARS\ars-product-service\opt\uploads\
   payment:
     vnp:
-      vnp-api-version: 2.1.0
-      vnp-tmn-code: ${VNP_TMN_CODE}
-      vnp-secure-hash: ${VNP_SECURE_HASH}
-      vnp-payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-      vnp-return-url: /api/p/v1/payments/callback/vn-pay
+      api-version: 2.1.0
+      tmn-code: ${VNP_TMN_CODE}
+      secure-hash: ${VNP_SECURE_HASH}
+      payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+      return-url: /api/p/v1/payments/callback/vn-pay
