@@ -213,9 +213,24 @@ app:
       locations:
         - file:D:\Workspaces\Projects\PTIT\ARS\ars-product-service\opt\uploads\
   payment:
-    vnp:
+    vn-pay:
       api-version: 2.1.0
       tmn-code: ${VNP_TMN_CODE}
       secure-hash: ${VNP_SECURE_HASH}
       payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
       return-url: /api/p/v1/payments/callback/vn-pay
+    pay-os:
+      money-receive-config:
+        api-key: ${PAY_OS_PAY_IN_API_KEY}
+        client-id: ${PAY_OS_PAY_IN_CLIENT_KEY}
+        checksum-key: ${PAY_OS_PAY_IN_CHECKSUM_KEY}
+        log-level: debug
+        cancel-url: http://localhost:8080/api/p/payments/payos/receive/cancel
+        return-url: http://localhost:8080/api/p/payments/payos/receive/return
+      money-checkout-config:
+        api-key: ${PAY_OS_PAY_OUT_API_KEY}
+        client-id: ${PAY_OS_PAY_OUT_CLIENT_KEY}
+        checksum-key: ${PAY_OS_PAY_OUT_CHECKSUM_KEY}
+        log-level: debug
+        cancel-url: http://localhost:8080/api/p/payments/payos/checkout/cancel
+        return-url: http://localhost:8080/api/p/payments/payos/checkout/return

@@ -1,5 +1,6 @@
 package com.ars.paymentservice.constants;
 
 public interface PropertiesConstants {
-    String VNP_SECRET_CONFIG = "app.payment.vnp";
+    String VN_PAY_CONFIG = "app.payment.vn-pay";
+    String PAY_OS_CONFIG = "app.payment.pay-os";
 }

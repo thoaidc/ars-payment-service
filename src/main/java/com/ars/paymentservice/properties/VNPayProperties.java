@@ -2,10 +2,8 @@ package com.ars.paymentservice.properties;
 
 import com.ars.paymentservice.constants.PropertiesConstants;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@ConfigurationProperties(prefix = PropertiesConstants.VNP_SECRET_CONFIG)
+@ConfigurationProperties(prefix = PropertiesConstants.VN_PAY_CONFIG)
 public class VNPayProperties {
     private String apiVersion;
     private String tmnCode;

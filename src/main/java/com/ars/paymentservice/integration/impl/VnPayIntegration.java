@@ -9,6 +9,7 @@ import com.dct.model.common.DateUtils;
 import com.dct.model.constants.BaseDatetimeConstants;
 
 import com.dct.model.exception.BaseIllegalArgumentException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,11 @@ public class VnPayIntegration implements IBankIntegration {
     private static final Logger log = LoggerFactory.getLogger(VnPayIntegration.class);
     private static final String ENTITY_NAME = "com.ars.paymentservice.integration.impl.VnPayIntegration";
     private final VNPayProperties vnPayProperties;
+    private final ObjectMapper objectMapper;
 
-    public VnPayIntegration(VNPayProperties vnPayProperties) {
+    public VnPayIntegration(VNPayProperties vnPayProperties, ObjectMapper objectMapper) {
         this.vnPayProperties = vnPayProperties;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class VnPayIntegration implements IBankIntegration {
     }
 
     @Override
-    public String genQR(PaymentRequestDTO paymentRequestDTO) {
+    public <T> T createPayment(PaymentRequestDTO paymentRequestDTO, Class<T> responseType) {
         Map<String, Object> vnpParamsRequest = createMapParamsData(paymentRequestDTO);
         Map<String, String> vnpParams = new HashMap<>();
 
@@ -86,11 +89,14 @@ public class VnPayIntegration implements IBankIntegration {
         String queryString = !query.isEmpty() ? query.substring(0, query.length() - 1) : "";
         String hashDataString = !hashData.isEmpty() ? hashData.substring(0, hashData.length() - 1) : "";
         String secureHash = createHmacSHA256String(vnPayProperties.getSecureHash(), hashDataString);
-        return String.format("%s?%s&%s=%s",
-                vnPayProperties.getPaymentUrl(),
-                queryString,
-                VNPayConstants.VNP_SECURE_HASH_KEY,
-                secureHash);
+        String paymentLink = String.format(
+            "%s?%s&%s=%s",
+            vnPayProperties.getPaymentUrl(),
+            queryString,
+            VNPayConstants.VNP_SECURE_HASH_KEY,
+            secureHash
+        );
+        return objectMapper.convertValue(paymentLink, responseType);
     }
 
     public Map<String, Object> createMapParamsData(PaymentRequestDTO request) {

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class PaymentRequestDTO {
     private String transId;
+    private Long transNumberId;
     private BigDecimal amount;
     private String locale;
     private String currencyCode;
@@ -18,6 +19,14 @@ public class PaymentRequestDTO {
 
     public void setTransId(String transId) {
         this.transId = transId;
+    }
+
+    public Long getTransNumberId() {
+        return transNumberId;
+    }
+
+    public void setTransNumberId(Long transNumberId) {
+        this.transNumberId = transNumberId;
     }
 
     public BigDecimal getAmount() {

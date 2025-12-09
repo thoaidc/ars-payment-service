@@ -36,7 +36,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
             paymentRequest.setVnpBankCode("MBB");
 
             IBankIntegration bankService = bankIntegrationFactory.getBankIntegration(requestDTO.getBankCode());
-            String paymentQrURL = bankService.genQR(paymentRequest);
+            String paymentQrURL = bankService.createPayment(paymentRequest, String.class);
             return BaseResponseDTO.builder().ok(paymentQrURL);
         } catch (Exception e) {
             log.error("[CREATE_QR_PAYMENT_ERROR] - Bank code: {}", requestDTO.getBankCode(), e);
