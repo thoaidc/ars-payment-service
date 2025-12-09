@@ -12,6 +12,7 @@ import com.dct.model.dto.response.BaseResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
 
 import java.math.BigDecimal;
 
@@ -29,15 +30,12 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
         try {
             PaymentRequestDTO paymentRequest = new PaymentRequestDTO();
             paymentRequest.setTransId("1212121");
-            paymentRequest.setAmount(new BigDecimal("10000"));
+            paymentRequest.setTransNumberId(13832909L);
+            paymentRequest.setAmount(new BigDecimal("2000"));
             paymentRequest.setPaymentContent("Thanh toan don hang abc");
-            paymentRequest.setVpnOrderType("other");
-            paymentRequest.setVnpCusIpAddress("127.0.0.1");
-            paymentRequest.setVnpBankCode("MBB");
-
             IBankIntegration bankService = bankIntegrationFactory.getBankIntegration(requestDTO.getBankCode());
-            String paymentQrURL = bankService.createPayment(paymentRequest, String.class);
-            return BaseResponseDTO.builder().ok(paymentQrURL);
+            CreatePaymentLinkResponse paymentInfo = bankService.createPayment(paymentRequest, CreatePaymentLinkResponse.class);
+            return BaseResponseDTO.builder().ok(paymentInfo);
         } catch (Exception e) {
             log.error("[CREATE_QR_PAYMENT_ERROR] - Bank code: {}", requestDTO.getBankCode(), e);
         }
