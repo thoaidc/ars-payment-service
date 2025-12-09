@@ -8,6 +8,7 @@ public interface PaymentConstants {
 
     interface Service {
         String VN_PAY = "vn_pay";
+        String PAY_OS = "pay_os";
     }
 
     int DEFAULT_PAYMENT_EXPIRED_DURATION = 5; // 5 minutes
