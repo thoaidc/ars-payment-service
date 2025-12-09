@@ -1,6 +1,5 @@
 package com.ars.paymentservice.service.impl;
 
-import com.ars.paymentservice.constants.VNPayConstants;
 import com.ars.paymentservice.dto.request.CreateQrRequestDTO;
 import com.ars.paymentservice.dto.request.PaymentRequestDTO;
 import com.ars.paymentservice.integration.IBankIntegration;
@@ -29,12 +28,12 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
     public BaseResponseDTO createQrPayment(CreateQrRequestDTO requestDTO) {
         try {
             PaymentRequestDTO paymentRequest = new PaymentRequestDTO();
-
-            paymentRequest.setTransId("TXNkjshfsdfsdjfsjdfjsdfj");
-            paymentRequest.setAmount(new BigDecimal("100000.00"));
+            paymentRequest.setTransId("1212121");
+            paymentRequest.setAmount(new BigDecimal("10000"));
             paymentRequest.setPaymentContent("Thanh toan don hang abc");
             paymentRequest.setVpnOrderType("other");
             paymentRequest.setVnpCusIpAddress("127.0.0.1");
+            paymentRequest.setVnpBankCode("MBB");
 
             IBankIntegration bankService = bankIntegrationFactory.getBankIntegration(requestDTO.getBankCode());
             String paymentQrURL = bankService.genQR(paymentRequest);

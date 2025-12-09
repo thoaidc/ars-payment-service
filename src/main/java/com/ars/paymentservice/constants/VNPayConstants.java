@@ -4,7 +4,7 @@ public interface VNPayConstants {
     // VNPay params key
     String VNP_VERSION_KEY = "vnp_Version";
     String VNP_COMMAND_KEY = "vnp_Command";
-    String VNP_TMN_CODE_KEY = "vnp_TMN_Code";
+    String VNP_TMN_CODE_KEY = "vnp_TmnCode";
     String VNP_AMOUNT_KEY = "vnp_Amount";
     String VNP_BANK_CODE_KEY = "vnp_BankCode";
     String VNP_CREATED_DATE_KEY = "vnp_CreateDate";
@@ -23,7 +23,6 @@ public interface VNPayConstants {
     String VNP_COMMAND = "pay";
     String VNP_CURRENCY_CODE = "VND";
     String VNP_LOCALE_VN = "vn";
-    String VNP_LOCALE_EN = "en";
     String VNP_DATE_TIME_FORMAT = "yyyyMMddHHmmss";
     String VNP_BANK_CODE_QR = "VNPAYQR";
 }

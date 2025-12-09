@@ -132,9 +132,9 @@ public class VnPayIntegration implements IBankIntegration {
         try {
             String algorithm = HmacAlgorithms.HMAC_SHA_256.getName();
             Mac mac = Mac.getInstance(algorithm);
-            SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.US_ASCII), algorithm);
+            SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algorithm);
             mac.init(secretKeySpec);
-            byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.US_ASCII));
+            byte[] hash = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
             Formatter formatter = new Formatter();
 
             for (byte b : hash) {
