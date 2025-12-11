@@ -4,5 +4,6 @@ import com.ars.paymentservice.dto.request.PaymentRequestDTO;
 
 public interface IBankIntegration {
     String getType();
-    <T> T createPayment(PaymentRequestDTO paymentRequestDTO, Class<T> responseType);
+    <T> T createPayment(PaymentRequestDTO paymentRequestDTO);
+    Class<?> getPaymentResponseType();
 }

@@ -28,4 +28,9 @@ public class PaymentResource {
     public BaseResponseDTO getPaymentHistoryDetail(@PathVariable Integer paymentHistoryId) {
         return paymentService.getPaymentHistoryDetail(paymentHistoryId);
     }
+
+    @GetMapping("/p/v1/payments/qr/{orderId}")
+    public BaseResponseDTO getQrPaymentInfoForOrder(@PathVariable Integer orderId) {
+        return paymentService.getPaymentInfo(orderId);
+    }
 }

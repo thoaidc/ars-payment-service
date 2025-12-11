@@ -2,8 +2,14 @@ package com.ars.paymentservice.constants;
 
 public interface PaymentConstants {
     interface Status {
+        String PENDING = "PENDING";
         String SUCCESS = "SUCCESS";
         String FAILURE = "FAILURE";
+    }
+
+    interface Type {
+        String PAY_FOR_ORDER = "PAY_FOR_ORDER";
+        String PAY_FOR_SUBSCRIPTION = "PAY_FOR_SUBSCRIPTION";
     }
 
     interface Service {

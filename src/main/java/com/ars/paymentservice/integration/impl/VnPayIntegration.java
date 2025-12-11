@@ -7,9 +7,9 @@ import com.ars.paymentservice.integration.IBankIntegration;
 import com.ars.paymentservice.properties.VNPayProperties;
 import com.dct.model.common.DateUtils;
 import com.dct.model.constants.BaseDatetimeConstants;
-
 import com.dct.model.exception.BaseIllegalArgumentException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.codec.digest.HmacAlgorithms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,8 @@ public class VnPayIntegration implements IBankIntegration {
     }
 
     @Override
-    public <T> T createPayment(PaymentRequestDTO paymentRequestDTO, Class<T> responseType) {
+    @SuppressWarnings("unchecked")
+    public <T> T createPayment(PaymentRequestDTO paymentRequestDTO) {
         Map<String, Object> vnpParamsRequest = createMapParamsData(paymentRequestDTO);
         Map<String, String> vnpParams = new HashMap<>();
 
@@ -96,7 +97,7 @@ public class VnPayIntegration implements IBankIntegration {
             VNPayConstants.VNP_SECURE_HASH_KEY,
             secureHash
         );
-        return objectMapper.convertValue(paymentLink, responseType);
+        return (T) objectMapper.convertValue(paymentLink, getPaymentResponseType());
     }
 
     public Map<String, Object> createMapParamsData(PaymentRequestDTO request) {
@@ -151,5 +152,10 @@ public class VnPayIntegration implements IBankIntegration {
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new BaseIllegalArgumentException(ENTITY_NAME, "Error calculate HMAC: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Class<?> getPaymentResponseType() {
+        return String.class;
     }
 }

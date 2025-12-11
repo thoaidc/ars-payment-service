@@ -33,6 +33,12 @@ public class PaymentHistory extends AbstractAuditingEntity {
     @Column(name = "amount")
     private BigDecimal amount;
 
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "info")
+    private String info;
+
     public String getType() {
         return type;
     }
@@ -87,5 +93,21 @@ public class PaymentHistory extends AbstractAuditingEntity {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
     }
 }

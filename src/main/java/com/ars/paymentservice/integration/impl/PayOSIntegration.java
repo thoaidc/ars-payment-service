@@ -33,7 +33,8 @@ public class PayOSIntegration implements IBankIntegration {
     }
 
     @Override
-    public <T> T createPayment(PaymentRequestDTO paymentRequestDTO, Class<T> responseType) {
+    @SuppressWarnings("unchecked")
+    public <T> T createPayment(PaymentRequestDTO paymentRequestDTO) {
         try {
             CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                     .orderCode(paymentRequestDTO.getTransNumberId())
@@ -43,7 +44,7 @@ public class PayOSIntegration implements IBankIntegration {
                     .cancelUrl(payOSProperties.getMoneyReceiveConfig().getCancelUrl())
                     .build();
             CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
-            return objectMapper.convertValue(data, responseType);
+            return (T) objectMapper.convertValue(data, getPaymentResponseType());
         } catch (Exception e) {
             log.error(
                 "[PAY_OS_GEN_QR_ERROR] - transNumberId: {}, amount: {}, content: {}, {}",
@@ -55,5 +56,10 @@ public class PayOSIntegration implements IBankIntegration {
         }
 
         return null;
+    }
+
+    @Override
+    public Class<?> getPaymentResponseType() {
+        return CreatePaymentLinkResponse.class;
     }
 }
