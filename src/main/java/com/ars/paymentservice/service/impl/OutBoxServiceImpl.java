@@ -32,14 +32,14 @@ public class OutBoxServiceImpl implements OutBoxService {
 
         for (OutBox outBox : outBoxes) {
             if (Objects.nonNull(outBox)) {
-                log.info("[SEND_EVENT_FROM_OUTBOX] - sagaId: {}, type: {}, content: {}",
-                    outBox.getSagaId(), outBox.getType(), outBox.getValue()
+                log.info("[SEND_EVENT_FROM_OUTBOX] - refId: {}, type: {}, content: {}",
+                    outBox.getRefId(), outBox.getType(), outBox.getValue()
                 );
 
                 switch (outBox.getType()) {
                     case BaseOutBoxConstants.Type.ORDER_PAYMENT_SUCCESSFUL ->
                             kafkaProducer.sendMessagePaymentSuccessful(outBox.getValue());
-                    case BaseOutBoxConstants.Type.USER_REGISTER_SHOP_FAILURE ->
+                    case BaseOutBoxConstants.Type.ORDER_PAYMENT_FAILURE ->
                             kafkaProducer.sendMessagePaymentFailure(outBox.getValue());
                 }
 

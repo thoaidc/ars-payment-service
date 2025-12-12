@@ -8,18 +8,18 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "outbox")
 public class OutBox extends AbstractAuditingEntity {
-    @Column(name = "saga_id")
-    private String sagaId;
+    @Column(name = "ref_id")
+    private Integer refId;
     private String type;
     private String value;
     private String status;
 
-    public String getSagaId() {
-        return sagaId;
+    public Integer getRefId() {
+        return refId;
     }
 
-    public void setSagaId(String sagaId) {
-        this.sagaId = sagaId;
+    public void setRefId(Integer refId) {
+        this.refId = refId;
     }
 
     public String getType() {

@@ -12,32 +12,47 @@ import java.time.Instant;
 @Table(name = "payment_history")
 @SuppressWarnings("unused")
 public class PaymentHistory extends AbstractAuditingEntity {
-    @Column(name = "type")
+    @Column(name = "type", nullable = false)
     private String type;
 
     @Column(name = "trans_id")
-    private String transId;
+    private String transId; // Response from BANK
 
-    @Column(name = "ref_id")
+    @Column(name = "ref_id", nullable = false)
     private Integer refId;
 
-    @Column(name = "payment_gateway_id")
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
+
+    @Column(name = "payment_gateway_id", nullable = false)
     private Integer paymentGatewayId;
 
-    @Column(name = "payment_method")
+    @Column(name = "payment_method", nullable = false)
     private String paymentMethod;
 
     @Column(name = "payment_time")
     private Instant paymentTime;
 
-    @Column(name = "amount")
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "status")
+    @Column(name = "refund")
+    private BigDecimal refund;
+
+    @Column(name = "status", nullable = false)
     private String status;
 
-    @Column(name = "info")
+    @Column(name = "info", nullable = false)
     private String info;
+
+    @Column(name = "error")
+    private String error;
+
+    @Column(name = "response")
+    private String response;
+
+    @Column(name = "description", nullable = false)
+    private String description;
 
     public String getType() {
         return type;
@@ -109,5 +124,45 @@ public class PaymentHistory extends AbstractAuditingEntity {
 
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public BigDecimal getRefund() {
+        return refund;
+    }
+
+    public void setRefund(BigDecimal refund) {
+        this.refund = refund;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }

@@ -147,6 +147,7 @@ app:
       - /api/internal/**
       - /favicon.ico
       - /uploads/products/**
+      - /api/v1/payments/webhook/payos
       - /
     external-service-public-request-patterns:
       - /api/p/**

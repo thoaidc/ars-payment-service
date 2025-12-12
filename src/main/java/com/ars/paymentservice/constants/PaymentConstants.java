@@ -5,6 +5,7 @@ public interface PaymentConstants {
         String PENDING = "PENDING";
         String SUCCESS = "SUCCESS";
         String FAILURE = "FAILURE";
+        String REFUND = "REFUND";
     }
 
     interface Type {
