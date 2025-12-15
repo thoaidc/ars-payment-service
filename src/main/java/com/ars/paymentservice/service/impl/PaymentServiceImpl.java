@@ -21,8 +21,8 @@ import com.dct.model.constants.BaseOutBoxConstants;
 import com.dct.model.dto.response.BaseResponseDTO;
 import com.dct.model.event.OrderCreatedEvent;
 import com.dct.model.event.PaymentFailureEvent;
-
 import com.dct.model.event.PaymentSuccessEvent;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -156,7 +156,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             if (paymentHistory.getAmount().compareTo(customerPayAmount) != 0) {
                 paymentHistory.setStatus(PaymentConstants.Status.REFUND);
-                paymentHistory.setRefund(customerPayAmount);
+                // paymentHistory.setRefund(customerPayAmount);
                 paymentHistory.setError("Invalid payment amount from customer: " + customerPayAmount);
                 cancelOrder(paymentHistory);
             } else {

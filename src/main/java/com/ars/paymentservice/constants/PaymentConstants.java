@@ -10,7 +10,6 @@ public interface PaymentConstants {
 
     interface Type {
         String PAY_FOR_ORDER = "PAY_FOR_ORDER";
-        String PAY_FOR_SUBSCRIPTION = "PAY_FOR_SUBSCRIPTION";
     }
 
     interface Service {

@@ -36,9 +36,6 @@ public class PaymentHistory extends AbstractAuditingEntity {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "refund")
-    private BigDecimal refund;
-
     @Column(name = "status", nullable = false)
     private String status;
 
@@ -148,14 +145,6 @@ public class PaymentHistory extends AbstractAuditingEntity {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public BigDecimal getRefund() {
-        return refund;
-    }
-
-    public void setRefund(BigDecimal refund) {
-        this.refund = refund;
     }
 
     public Integer getUserId() {
