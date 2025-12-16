@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, Integer> {
-    Optional<PaymentHistory> findByTypeAndRefId(String type, Integer refId);
+    Optional<PaymentHistory> findByTypeAndRefId(Integer type, Integer refId);
 }

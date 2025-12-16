@@ -24,7 +24,7 @@ CREATE TABLE payment_gateway (
 DROP TABLE IF EXISTS payment_history;
 CREATE TABLE payment_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    type VARCHAR(100) NOT NULL,
+    type INT NOT NULL,
     ref_id INT NOT NULL,
     user_id INT NOT NULL,
     trans_id VARCHAR(255), -- From BANK

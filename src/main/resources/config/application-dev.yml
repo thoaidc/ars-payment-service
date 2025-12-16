@@ -108,6 +108,7 @@ spring:
       order-created: order-created
       order-payment-successful: order-payment-successful
       order-payment-failure: order-payment-failure
+      change-balance-amount: change-balance-amount
 
 server:
   servlet:

@@ -9,7 +9,9 @@ public interface PaymentConstants {
     }
 
     interface Type {
-        String PAY_FOR_ORDER = "PAY_FOR_ORDER";
+        Integer PAY_FOR_ORDER = 1;
+        Integer SYSTEM_ADD_MONEY = 2;
+        Integer SYSTEM_REFUND = 3;
     }
 
     interface Service {

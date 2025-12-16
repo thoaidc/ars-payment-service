@@ -13,7 +13,7 @@ import java.time.Instant;
 @SuppressWarnings("unused")
 public class PaymentHistory extends AbstractAuditingEntity {
     @Column(name = "type", nullable = false)
-    private String type;
+    private Integer type;
 
     @Column(name = "trans_id")
     private String transId; // Response from BANK
@@ -51,11 +51,11 @@ public class PaymentHistory extends AbstractAuditingEntity {
     @Column(name = "description", nullable = false)
     private String description;
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 

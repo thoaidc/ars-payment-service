@@ -25,6 +25,7 @@ import com.dct.model.event.PaymentSuccessEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.payos.model.webhooks.WebhookData;
@@ -44,7 +45,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     public PaymentServiceImpl(PaymentGatewayRepository paymentGatewayRepository,
                               PaymentHistoryRepository paymentHistoryRepository,
-                              BankIntegrationFactory bankIntegrationFactory, OutBoxRepository outBoxRepository) {
+                              BankIntegrationFactory bankIntegrationFactory,
+                              OutBoxRepository outBoxRepository) {
         this.paymentGatewayRepository = paymentGatewayRepository;
         this.paymentHistoryRepository = paymentHistoryRepository;
         this.bankIntegrationFactory = bankIntegrationFactory;
@@ -155,9 +157,9 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal customerPayAmount = BigDecimal.valueOf(payOSWebhookData.getAmount());
 
             if (paymentHistory.getAmount().compareTo(customerPayAmount) != 0) {
-                paymentHistory.setStatus(PaymentConstants.Status.REFUND);
-                // paymentHistory.setRefund(customerPayAmount);
+                paymentHistory.setStatus(PaymentConstants.Status.FAILURE);
                 paymentHistory.setError("Invalid payment amount from customer: " + customerPayAmount);
+                createRefundHistory(paymentHistory, customerPayAmount);
                 cancelOrder(paymentHistory);
             } else {
                 paymentHistory.setStatus(PaymentConstants.Status.SUCCESS);
@@ -170,6 +172,21 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         paymentHistoryRepository.save(paymentHistory);
+    }
+
+    private void createRefundHistory(PaymentHistory paymentHistory, BigDecimal customerPayAmount) {
+        PaymentHistory refundHistory = new PaymentHistory();
+        BeanUtils.copyProperties(paymentHistory, refundHistory, "id", "transId", "paymentTime", "info");
+        refundHistory.setUserId(0); // System refund
+        refundHistory.setRefId(paymentHistory.getUserId()); // Refund for customer
+        refundHistory.setType(PaymentConstants.Type.SYSTEM_REFUND);
+        refundHistory.setAmount(customerPayAmount);
+        refundHistory.setStatus(PaymentConstants.Status.PENDING);
+        Integer orderId = paymentHistory.getRefId();
+        Integer customerId = paymentHistory.getUserId();
+        String description = String.format("Hoan tien don hang: %s cho khach hang: %s", orderId, customerId);
+        refundHistory.setDescription(description);
+        paymentHistoryRepository.save(refundHistory);
     }
 
     private void confirmOrderPaymentSuccessful(PaymentHistory paymentHistory) {
