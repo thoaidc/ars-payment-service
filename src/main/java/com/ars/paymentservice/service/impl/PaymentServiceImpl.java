@@ -18,6 +18,7 @@ import com.dct.model.common.DateUtils;
 import com.dct.model.common.JsonUtils;
 import com.dct.model.constants.BaseDatetimeConstants;
 import com.dct.model.constants.BaseOutBoxConstants;
+import com.dct.model.constants.BasePaymentConstants;
 import com.dct.model.dto.response.BaseResponseDTO;
 import com.dct.model.event.OrderCreatedEvent;
 import com.dct.model.event.PaymentFailureEvent;
@@ -84,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentRequest.setPaymentContent("Thanh toan don hang: " + orderRequest.getOrderId());
             PaymentHistory paymentHistory = new PaymentHistory();
             Optional<Integer> paymentGatewayId = paymentGatewayRepository.findIdByCode(orderRequest.getPaymentMethod());
-            paymentHistory.setType(PaymentConstants.Type.PAY_FOR_ORDER);
+            paymentHistory.setType(BasePaymentConstants.PaymentType.ORDER_PAYMENT);
             paymentHistory.setRefId(orderRequest.getOrderId());
             paymentHistory.setUserId(orderRequest.getUserId());
             paymentHistory.setPaymentGatewayId(paymentGatewayId.orElse(0));
@@ -124,7 +125,7 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             int orderId = payOSWebhookData.getOrderCode().intValue();
             Optional<PaymentHistory> paymentHistoryOptional = paymentHistoryRepository.findByTypeAndRefId(
-                PaymentConstants.Type.PAY_FOR_ORDER,
+                BasePaymentConstants.PaymentType.ORDER_PAYMENT,
                 orderId
             );
 
@@ -179,7 +180,7 @@ public class PaymentServiceImpl implements PaymentService {
         BeanUtils.copyProperties(paymentHistory, refundHistory, "id", "transId", "paymentTime", "info");
         refundHistory.setUserId(0); // System refund
         refundHistory.setRefId(paymentHistory.getUserId()); // Refund for customer
-        refundHistory.setType(PaymentConstants.Type.SYSTEM_REFUND);
+        refundHistory.setType(BasePaymentConstants.PaymentType.REFUND_TO_CUSTOMER);
         refundHistory.setAmount(customerPayAmount);
         refundHistory.setStatus(PaymentConstants.Status.PENDING);
         Integer orderId = paymentHistory.getRefId();

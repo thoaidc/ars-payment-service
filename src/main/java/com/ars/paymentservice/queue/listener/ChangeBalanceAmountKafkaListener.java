@@ -1,9 +1,9 @@
 package com.ars.paymentservice.queue.listener;
 
 import com.ars.paymentservice.constants.KafkaConstants;
-import com.ars.paymentservice.dto.request.ChangeBalanceAmountEvent;
 import com.ars.paymentservice.service.BalanceService;
 import com.dct.model.common.JsonUtils;
+import com.dct.model.event.ChangeBalanceAmountEvent;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
