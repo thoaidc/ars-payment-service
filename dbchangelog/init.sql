@@ -26,6 +26,7 @@ CREATE TABLE payment_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
     type INT NOT NULL,
     ref_id INT NOT NULL,
+    receiver_id INT NOT NULL,
     user_id INT NOT NULL,
     trans_id VARCHAR(255), -- From BANK
     payment_gateway_id INT NOT NULL,

@@ -88,6 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentHistory.setType(BasePaymentConstants.PaymentType.ORDER_PAYMENT);
             paymentHistory.setRefId(orderRequest.getOrderId());
             paymentHistory.setUserId(orderRequest.getUserId());
+            paymentHistory.setReceiverId(PaymentConstants.SYSTEM_ACCOUNT_ID);
             paymentHistory.setPaymentGatewayId(paymentGatewayId.orElse(0));
             paymentHistory.setPaymentMethod(orderRequest.getPaymentMethod());
             paymentHistory.setAmount(orderRequest.getAmount());
@@ -178,8 +179,8 @@ public class PaymentServiceImpl implements PaymentService {
     private void createRefundHistory(PaymentHistory paymentHistory, BigDecimal customerPayAmount) {
         PaymentHistory refundHistory = new PaymentHistory();
         BeanUtils.copyProperties(paymentHistory, refundHistory, "id", "transId", "paymentTime", "info");
-        refundHistory.setUserId(0); // System refund
-        refundHistory.setRefId(paymentHistory.getUserId()); // Refund for customer
+        refundHistory.setUserId(PaymentConstants.SYSTEM_ACCOUNT_ID);
+        refundHistory.setReceiverId(paymentHistory.getUserId());
         refundHistory.setType(BasePaymentConstants.PaymentType.REFUND_TO_CUSTOMER);
         refundHistory.setAmount(customerPayAmount);
         refundHistory.setStatus(PaymentConstants.Status.PENDING);

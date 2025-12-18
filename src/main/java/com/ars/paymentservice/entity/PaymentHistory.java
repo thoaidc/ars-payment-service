@@ -21,6 +21,9 @@ public class PaymentHistory extends AbstractAuditingEntity {
     @Column(name = "ref_id", nullable = false)
     private Integer refId;
 
+    @Column(name = "receiver_id", nullable = false)
+    private Integer receiverId;
+
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
@@ -73,6 +76,14 @@ public class PaymentHistory extends AbstractAuditingEntity {
 
     public void setRefId(Integer refId) {
         this.refId = refId;
+    }
+
+    public Integer getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(Integer receiverId) {
+        this.receiverId = receiverId;
     }
 
     public Integer getPaymentGatewayId() {

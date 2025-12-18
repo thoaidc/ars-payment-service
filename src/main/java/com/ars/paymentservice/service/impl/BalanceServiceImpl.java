@@ -55,7 +55,7 @@ public class BalanceServiceImpl implements BalanceService {
     public BaseResponseDTO getBalanceForAdmin() {
         Common.getUserWithAuthorities();
         Integer balanceType = BasePaymentConstants.BalanceType.SYSTEM;
-        Integer refId = 0; // System ID
+        Integer refId = PaymentConstants.SYSTEM_ACCOUNT_ID;
         Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, refId);
         Balance balance = balanceOptional.orElse(null);
 
@@ -75,7 +75,8 @@ public class BalanceServiceImpl implements BalanceService {
     public void updateBalanceAmount(ChangeBalanceAmountEvent changeBalanceAmountEvent) {
         PaymentHistory paymentHistory = new PaymentHistory();
         paymentHistory.setRefId(changeBalanceAmountEvent.getRefId());
-        paymentHistory.setUserId(0); // System ID
+        paymentHistory.setReceiverId(changeBalanceAmountEvent.getReceiverId());
+        paymentHistory.setUserId(PaymentConstants.SYSTEM_ACCOUNT_ID);
         paymentHistory.setPaymentGatewayId(0);
         paymentHistory.setPaymentMethod(PaymentConstants.Service.SYSTEM);
         paymentHistory.setAmount(changeBalanceAmountEvent.getAmount());
@@ -93,11 +94,11 @@ public class BalanceServiceImpl implements BalanceService {
                 break;
         }
 
-        Integer refId = changeBalanceAmountEvent.getRefId();
+        Integer accountOwnerId = changeBalanceAmountEvent.getReceiverId();
         Integer balanceType = changeBalanceAmountEvent.getType();
-        Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, refId);
+        Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, accountOwnerId);
         Balance balance = balanceOptional.orElseGet(Balance::new);
-        balance.setRefId(refId);
+        balance.setRefId(accountOwnerId);
         balance.setType(balanceType);
         BigDecimal oldBalance = Optional.ofNullable(balance.getBalance()).orElse(BigDecimal.ZERO);
         BigDecimal additionalBalance = Optional.ofNullable(changeBalanceAmountEvent.getAmount()).orElse(BigDecimal.ZERO);

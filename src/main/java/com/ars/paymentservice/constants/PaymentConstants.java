@@ -13,5 +13,6 @@ public interface PaymentConstants {
         String SYSTEM = "SYSTEM";
     }
 
+    int SYSTEM_ACCOUNT_ID = 0;
     int DEFAULT_PAYMENT_EXPIRED_DURATION = 5; // 5 minutes
 }
