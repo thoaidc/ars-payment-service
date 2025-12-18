@@ -6,7 +6,11 @@ import com.ars.paymentservice.entity.PaymentHistory;
 import com.ars.paymentservice.repository.BalanceRepository;
 import com.ars.paymentservice.repository.PaymentHistoryRepository;
 import com.ars.paymentservice.service.BalanceService;
+
+import com.dct.config.common.Common;
 import com.dct.model.constants.BasePaymentConstants;
+import com.dct.model.dto.auth.BaseUserDTO;
+import com.dct.model.dto.response.BaseResponseDTO;
 import com.dct.model.event.ChangeBalanceAmountEvent;
 
 import org.springframework.stereotype.Service;
@@ -14,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +30,44 @@ public class BalanceServiceImpl implements BalanceService {
     public BalanceServiceImpl(BalanceRepository balanceRepository, PaymentHistoryRepository paymentHistoryRepository) {
         this.balanceRepository = balanceRepository;
         this.paymentHistoryRepository = paymentHistoryRepository;
+    }
+
+    @Override
+    @Transactional
+    public BaseResponseDTO getBalanceForShop() {
+        BaseUserDTO userDTO = Common.getUserWithAuthorities();
+        Integer balanceType = BasePaymentConstants.BalanceType.SHOP;
+        Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, userDTO.getId());
+        Balance balance = balanceOptional.orElseGet(Balance::new);
+
+        if (Objects.isNull(balance.getId())) {
+            balance.setBalance(BigDecimal.ZERO);
+            balance.setRefId(userDTO.getId());
+            balance.setType(balanceType);
+            balanceRepository.save(balance);
+        }
+
+        return BaseResponseDTO.builder().ok(balance);
+    }
+
+    @Override
+    @Transactional
+    public BaseResponseDTO getBalanceForAdmin() {
+        Common.getUserWithAuthorities();
+        Integer balanceType = BasePaymentConstants.BalanceType.SYSTEM;
+        Integer refId = 0; // System ID
+        Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, refId);
+        Balance balance = balanceOptional.orElse(null);
+
+        if (Objects.isNull(balance)) {
+            balance = new Balance();
+            balance.setBalance(BigDecimal.ZERO);
+            balance.setRefId(refId);
+            balance.setType(balanceType);
+            balanceRepository.save(balance);
+        }
+
+        return BaseResponseDTO.builder().ok(balance);
     }
 
     @Override
