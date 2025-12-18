@@ -31,7 +31,7 @@ CREATE TABLE payment_history (
     payment_gateway_id INT NOT NULL,
     payment_method VARCHAR(50) NOT NULL,
     amount DECIMAL(21, 6) DEFAULT 0.00 NOT NULL,
-    info VARCHAR(2000) NOT NULL,
+    info VARCHAR(2000),
     status VARCHAR(20) NOT NULL,
     payment_time TIMESTAMP,
     response VARCHAR(2000),
