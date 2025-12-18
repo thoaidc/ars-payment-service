@@ -37,7 +37,7 @@ public class BalanceServiceImpl implements BalanceService {
     public BaseResponseDTO getBalanceForShop() {
         BaseUserDTO userDTO = Common.getUserWithAuthorities();
         Integer balanceType = BasePaymentConstants.BalanceType.SHOP;
-        Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, userDTO.getId());
+        Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, userDTO.getShopId());
         Balance balance = balanceOptional.orElseGet(Balance::new);
 
         if (Objects.isNull(balance.getId())) {
@@ -47,7 +47,7 @@ public class BalanceServiceImpl implements BalanceService {
             balanceRepository.save(balance);
         }
 
-        return BaseResponseDTO.builder().ok(balance);
+        return BaseResponseDTO.builder().ok(balance.getBalance());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BalanceServiceImpl implements BalanceService {
             balanceRepository.save(balance);
         }
 
-        return BaseResponseDTO.builder().ok(balance);
+        return BaseResponseDTO.builder().ok(balance.getBalance());
     }
 
     @Override
