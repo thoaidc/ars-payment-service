@@ -33,4 +33,14 @@ public class PaymentResource {
     public BaseResponseDTO getQrPaymentInfoForOrder(@PathVariable Integer orderId) {
         return paymentService.getPaymentInfo(orderId);
     }
+
+    @GetMapping("/v1/payments/revenues/last-seven-day")
+    public BaseResponseDTO getRevenueLastSevenDay(@RequestParam Integer type, @RequestParam Integer receiverId) {
+        return paymentService.getRevenueLastSevenDay(type, receiverId);
+    }
+
+    @GetMapping("/v1/payments/revenues/today")
+    public BaseResponseDTO getRevenueLastToDay(@RequestParam Integer type, @RequestParam Integer receiverId) {
+        return paymentService.getRevenueToDay(type, receiverId);
+    }
 }

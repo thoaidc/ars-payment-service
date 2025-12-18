@@ -3,6 +3,7 @@ package com.ars.paymentservice.service.impl;
 import com.ars.paymentservice.constants.PayOSConstants;
 import com.ars.paymentservice.constants.PaymentConstants;
 import com.ars.paymentservice.dto.mapping.PaymentGatewayResponse;
+import com.ars.paymentservice.dto.mapping.RevenueDataMapping;
 import com.ars.paymentservice.dto.request.PaymentRequestDTO;
 import com.ars.paymentservice.dto.request.SearchPaymentHistoriesRequestDTO;
 import com.ars.paymentservice.entity.OutBox;
@@ -73,6 +74,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public BaseResponseDTO getPaymentInfo(Integer orderId) {
         return null;
+    }
+
+    @Override
+    public BaseResponseDTO getRevenueLastSevenDay(Integer type, Integer receiverId) {
+        List<RevenueDataMapping> revenueDataMappings = paymentHistoryRepository.getRevenueLastSevenDay(type, receiverId);
+        return BaseResponseDTO.builder().ok(revenueDataMappings);
+    }
+
+    @Override
+    public BaseResponseDTO getRevenueToDay(Integer type, Integer receiverId) {
+        BigDecimal revenueToday = paymentHistoryRepository.getRevenueToDay(type, receiverId);
+        return BaseResponseDTO.builder().ok(Optional.ofNullable(revenueToday).orElse(BigDecimal.ZERO));
     }
 
     @Override

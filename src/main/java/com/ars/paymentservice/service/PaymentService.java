@@ -10,6 +10,8 @@ public interface PaymentService {
     BaseResponseDTO getPaymentHistoriesWithPaging(SearchPaymentHistoriesRequestDTO requestDTO);
     BaseResponseDTO getPaymentHistoryDetail(Integer paymentHistoryId);
     BaseResponseDTO getPaymentInfo(Integer orderId);
+    BaseResponseDTO getRevenueLastSevenDay(Integer type, Integer receiverId);
+    BaseResponseDTO getRevenueToDay(Integer type, Integer receiverId);
     void createPayment(OrderCreatedEvent orderCreatedEvent);
     void handlePayOSWebhookData(WebhookData payOSWebhookData);
     void cancelOrderPaymentRequest(OrderCreatedEvent orderCreatedEvent, String errorMessage);
