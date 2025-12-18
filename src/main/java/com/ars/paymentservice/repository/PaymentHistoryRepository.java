@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, Integer> {
+public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, Integer>, PaymentHistoryRepositoryCustom {
     Optional<PaymentHistory> findByTypeAndRefId(Integer type, Integer refId);
 
     @Query(value = """
@@ -41,4 +41,7 @@ public interface PaymentHistoryRepository extends JpaRepository<PaymentHistory, 
         nativeQuery = true
     )
     BigDecimal getRevenueToDay(Integer type, Integer receiverId);
+
+    @Query(value = "SELECT p.info FROM payment_history p WHERE p.type = 1 AND p.ref_id = ? AND p.status = 'PENDING'", nativeQuery = true)
+    Optional<String> getPaymentInfoByRefId(Integer orderId);
 }

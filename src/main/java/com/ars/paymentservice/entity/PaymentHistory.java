@@ -1,8 +1,13 @@
 package com.ars.paymentservice.entity;
 
+import com.ars.paymentservice.dto.response.PaymentHistoryDTO;
 import com.dct.config.entity.AbstractAuditingEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.ColumnResult;
+import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
+import jakarta.persistence.SqlResultSetMapping;
+import jakarta.persistence.SqlResultSetMappings;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
@@ -11,6 +16,30 @@ import java.time.Instant;
 @Entity
 @Table(name = "payment_history")
 @SuppressWarnings("unused")
+@SqlResultSetMappings(
+    {
+        @SqlResultSetMapping(
+            name = "paymentHistoriesGetWithPaging",
+            classes = {
+                @ConstructorResult(
+                    targetClass = PaymentHistoryDTO.class,
+                    columns = {
+                        @ColumnResult(name = "id", type = Integer.class),
+                        @ColumnResult(name = "type", type = Integer.class),
+                        @ColumnResult(name = "userId", type = Integer.class),
+                        @ColumnResult(name = "receiverId", type = Integer.class),
+                        @ColumnResult(name = "transId", type = String.class),
+                        @ColumnResult(name = "amount", type = BigDecimal.class),
+                        @ColumnResult(name = "status", type = String.class),
+                        @ColumnResult(name = "description", type = String.class),
+                        @ColumnResult(name = "paymentMethod", type = String.class),
+                        @ColumnResult(name = "paymentTime", type = Instant.class)
+                    }
+                )
+            }
+        )
+    }
+)
 public class PaymentHistory extends AbstractAuditingEntity {
     @Column(name = "type", nullable = false)
     private Integer type;

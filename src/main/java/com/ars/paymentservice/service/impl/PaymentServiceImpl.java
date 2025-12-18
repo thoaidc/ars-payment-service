@@ -6,6 +6,7 @@ import com.ars.paymentservice.dto.mapping.PaymentGatewayResponse;
 import com.ars.paymentservice.dto.mapping.RevenueDataMapping;
 import com.ars.paymentservice.dto.request.PaymentRequestDTO;
 import com.ars.paymentservice.dto.request.SearchPaymentHistoriesRequestDTO;
+import com.ars.paymentservice.dto.response.PaymentHistoryDTO;
 import com.ars.paymentservice.entity.OutBox;
 import com.ars.paymentservice.entity.PaymentHistory;
 import com.ars.paymentservice.integration.IBankIntegration;
@@ -24,12 +25,16 @@ import com.dct.model.dto.response.BaseResponseDTO;
 import com.dct.model.event.OrderCreatedEvent;
 import com.dct.model.event.PaymentFailureEvent;
 import com.dct.model.event.PaymentSuccessEvent;
+import com.dct.model.exception.BaseBadRequestException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
 import vn.payos.model.webhooks.WebhookData;
 
 import java.math.BigDecimal;
@@ -40,6 +45,7 @@ import java.util.Optional;
 @Service
 public class PaymentServiceImpl implements PaymentService {
     private static final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
+    private static final String ENTITY_NAME = "com.ars.paymentservice.service.impl.PaymentServiceImpl";
     private final PaymentGatewayRepository paymentGatewayRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final BankIntegrationFactory bankIntegrationFactory;
@@ -63,17 +69,34 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public BaseResponseDTO getPaymentHistoriesWithPaging(SearchPaymentHistoriesRequestDTO requestDTO) {
-        return null;
+        Page<PaymentHistoryDTO> paymentHistoryPage = paymentHistoryRepository.getAllWithPaging(requestDTO);
+        return BaseResponseDTO.builder().total(paymentHistoryPage.getTotalElements()).ok(paymentHistoryPage.getContent());
     }
 
     @Override
     public BaseResponseDTO getPaymentHistoryDetail(Integer paymentHistoryId) {
-        return null;
+        Optional<PaymentHistory> paymentHistoryOptional = paymentHistoryRepository.findById(paymentHistoryId);
+
+        if (paymentHistoryOptional.isEmpty()) {
+            throw new BaseBadRequestException(ENTITY_NAME, "Payment history not found");
+        }
+
+        PaymentHistory paymentHistory = paymentHistoryOptional.get();
+        PaymentHistoryDTO paymentHistoryDTO = new PaymentHistoryDTO();
+        BeanUtils.copyProperties(paymentHistory, paymentHistoryDTO);
+        return BaseResponseDTO.builder().ok(paymentHistoryDTO);
     }
 
     @Override
     public BaseResponseDTO getPaymentInfo(Integer orderId) {
-        return null;
+        String paymentInfo = paymentHistoryRepository.getPaymentInfoByRefId(orderId).orElse(null);
+
+        if (StringUtils.hasText(paymentInfo)) {
+            CreatePaymentLinkResponse paymentData = JsonUtils.convertValue(paymentInfo, CreatePaymentLinkResponse.class);
+            return BaseResponseDTO.builder().ok(paymentData);
+        }
+
+        throw new BaseBadRequestException(ENTITY_NAME, "Payment info not found");
     }
 
     @Override
