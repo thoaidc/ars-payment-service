@@ -6,6 +6,7 @@ import com.ars.paymentservice.dto.mapping.PaymentGatewayResponse;
 import com.ars.paymentservice.dto.mapping.RevenueDataMapping;
 import com.ars.paymentservice.dto.request.PaymentRequestDTO;
 import com.ars.paymentservice.dto.request.SearchPaymentHistoriesRequestDTO;
+import com.ars.paymentservice.dto.response.PayOSPaymentInfo;
 import com.ars.paymentservice.dto.response.PaymentHistoryDTO;
 import com.ars.paymentservice.entity.OutBox;
 import com.ars.paymentservice.entity.PaymentHistory;
@@ -34,7 +35,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
 import vn.payos.model.webhooks.WebhookData;
 
 import java.math.BigDecimal;
@@ -92,7 +92,7 @@ public class PaymentServiceImpl implements PaymentService {
         String paymentInfo = paymentHistoryRepository.getPaymentInfoByRefId(orderId).orElse(null);
 
         if (StringUtils.hasText(paymentInfo)) {
-            CreatePaymentLinkResponse paymentData = JsonUtils.convertValue(paymentInfo, CreatePaymentLinkResponse.class);
+            PayOSPaymentInfo paymentData = JsonUtils.parseJson(paymentInfo, PayOSPaymentInfo.class);
             return BaseResponseDTO.builder().ok(paymentData);
         }
 
