@@ -23,6 +23,8 @@ import com.dct.model.common.JsonUtils;
 import com.dct.model.constants.BaseDatetimeConstants;
 import com.dct.model.constants.BaseOutBoxConstants;
 import com.dct.model.constants.BasePaymentConstants;
+import com.dct.model.dto.auth.BaseUserDTO;
+import com.dct.model.dto.request.BaseRequestDTO;
 import com.dct.model.dto.response.BaseResponseDTO;
 import com.dct.model.event.OrderCreatedEvent;
 import com.dct.model.event.PaymentFailureEvent;
@@ -130,6 +132,17 @@ public class PaymentServiceImpl implements PaymentService {
             PaymentConstants.SYSTEM_ACCOUNT_ID
         );
         return BaseResponseDTO.builder().ok(Optional.ofNullable(revenueToday).orElse(BigDecimal.ZERO));
+    }
+
+    @Override
+    public BaseResponseDTO getFinanceStatistic(BaseRequestDTO requestDTO, boolean forAdmin) {
+        BaseUserDTO userDTO = Common.getUserWithAuthorities();
+
+        if (forAdmin) {
+            return paymentHistoryRepository.getFinanceStatisticForShop(userDTO.getShopId(), requestDTO);
+        } else {
+            return paymentHistoryRepository.getFinanceStatisticForAdmin(requestDTO);
+        }
     }
 
     @Override

@@ -4,6 +4,9 @@ import com.ars.paymentservice.dto.request.SearchPaymentHistoriesRequestDTO;
 import com.ars.paymentservice.dto.response.PaymentHistoryDTO;
 import com.ars.paymentservice.repository.PaymentHistoryRepositoryCustom;
 import com.dct.config.common.SqlUtils;
+import com.dct.model.dto.request.BaseRequestDTO;
+import com.dct.model.dto.response.BaseResponseDTO;
+
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
@@ -41,5 +44,15 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
                 .pageable(request.getPageable())
                 .params(params)
                 .getResultsWithPaging("paymentHistoriesGetWithPaging");
+    }
+
+    @Override
+    public BaseResponseDTO getFinanceStatisticForShop(Integer shopId, BaseRequestDTO requestDTO) {
+        return null;
+    }
+
+    @Override
+    public BaseResponseDTO getFinanceStatisticForAdmin(BaseRequestDTO requestDTO) {
+        return null;
     }
 }
