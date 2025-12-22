@@ -40,7 +40,17 @@ public class PaymentResource {
     }
 
     @GetMapping("/v1/payments/revenues/today")
-    public BaseResponseDTO getRevenueLastToDay(@RequestParam Integer type, @RequestParam Integer receiverId) {
+    public BaseResponseDTO getRevenueToDay(@RequestParam Integer type, @RequestParam Integer receiverId) {
         return paymentService.getRevenueToDay(type, receiverId);
+    }
+
+    @GetMapping("/v1/payments/revenues/admin/last-seven-day")
+    public BaseResponseDTO getRevenueLastSevenDayForAdmin() {
+        return paymentService.getRevenueLastSevenDayForAdmin();
+    }
+
+    @GetMapping("/v1/payments/revenues/admin/today")
+    public BaseResponseDTO getRevenueToDayForAdmin() {
+        return paymentService.getRevenueToDayForAdmin();
     }
 }

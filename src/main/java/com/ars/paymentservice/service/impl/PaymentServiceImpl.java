@@ -17,6 +17,7 @@ import com.ars.paymentservice.repository.PaymentGatewayRepository;
 import com.ars.paymentservice.repository.PaymentHistoryRepository;
 import com.ars.paymentservice.service.PaymentService;
 
+import com.dct.config.common.Common;
 import com.dct.model.common.DateUtils;
 import com.dct.model.common.JsonUtils;
 import com.dct.model.constants.BaseDatetimeConstants;
@@ -106,8 +107,28 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public BaseResponseDTO getRevenueLastSevenDayForAdmin() {
+        Common.checkShopAuthorities(PaymentConstants.SYSTEM_ACCOUNT_ID);
+        List<RevenueDataMapping> revenueDataMappings = paymentHistoryRepository.getRevenueLastSevenDay(
+            BasePaymentConstants.PaymentType.ORDER_PAYMENT,
+            PaymentConstants.SYSTEM_ACCOUNT_ID
+        );
+        return BaseResponseDTO.builder().ok(revenueDataMappings);
+    }
+
+    @Override
     public BaseResponseDTO getRevenueToDay(Integer type, Integer receiverId) {
         BigDecimal revenueToday = paymentHistoryRepository.getRevenueToDay(type, receiverId);
+        return BaseResponseDTO.builder().ok(Optional.ofNullable(revenueToday).orElse(BigDecimal.ZERO));
+    }
+
+    @Override
+    public BaseResponseDTO getRevenueToDayForAdmin() {
+        Common.checkShopAuthorities(PaymentConstants.SYSTEM_ACCOUNT_ID);
+        BigDecimal revenueToday = paymentHistoryRepository.getRevenueToDay(
+            BasePaymentConstants.PaymentType.ORDER_PAYMENT,
+            PaymentConstants.SYSTEM_ACCOUNT_ID
+        );
         return BaseResponseDTO.builder().ok(Optional.ofNullable(revenueToday).orElse(BigDecimal.ZERO));
     }
 

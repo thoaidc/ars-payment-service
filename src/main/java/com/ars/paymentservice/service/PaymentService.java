@@ -11,7 +11,9 @@ public interface PaymentService {
     BaseResponseDTO getPaymentHistoryDetail(Integer paymentHistoryId);
     BaseResponseDTO getPaymentInfo(Integer orderId);
     BaseResponseDTO getRevenueLastSevenDay(Integer type, Integer receiverId);
+    BaseResponseDTO getRevenueLastSevenDayForAdmin();
     BaseResponseDTO getRevenueToDay(Integer type, Integer receiverId);
+    BaseResponseDTO getRevenueToDayForAdmin();
     void createPayment(OrderCreatedEvent orderCreatedEvent);
     void handlePayOSWebhookData(WebhookData payOSWebhookData);
     void cancelOrderPaymentRequest(OrderCreatedEvent orderCreatedEvent, String errorMessage);
