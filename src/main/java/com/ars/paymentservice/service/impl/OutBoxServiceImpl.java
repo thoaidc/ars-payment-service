@@ -29,24 +29,27 @@ public class OutBoxServiceImpl implements OutBoxService {
     @Transactional
     public void processOutBoxEvent() {
         List<OutBox> outBoxes = outBoxRepository.findTopOutBoxesByStatus(BaseOutBoxConstants.Status.PENDING);
-
-        for (OutBox outBox : outBoxes) {
-            if (Objects.nonNull(outBox)) {
-                log.info("[SEND_EVENT_FROM_OUTBOX] - refId: {}, type: {}, content: {}",
-                    outBox.getRefId(), outBox.getType(), outBox.getValue()
-                );
-
-                switch (outBox.getType()) {
-                    case BaseOutBoxConstants.Type.ORDER_PAYMENT_SUCCESSFUL ->
-                            kafkaProducer.sendMessagePaymentSuccessful(outBox.getValue());
-                    case BaseOutBoxConstants.Type.ORDER_PAYMENT_FAILURE ->
-                            kafkaProducer.sendMessagePaymentFailure(outBox.getValue());
-                }
-
-                outBox.setStatus(BaseOutBoxConstants.Status.COMPLETION);
-            }
-        }
-
+        outBoxes = outBoxes.stream().filter(Objects::nonNull).toList();
+        outBoxes.forEach(this::sendOutBoxMessage);
         outBoxRepository.saveAll(outBoxes);
+    }
+
+    private void sendOutBoxMessage(OutBox outBox) {
+        log.info("[SEND_EVENT_FROM_OUTBOX] - refId: {}, type: {}", outBox.getRefId(), outBox.getType());
+
+        try {
+            switch (outBox.getType()) {
+                case BaseOutBoxConstants.Type.ORDER_PAYMENT_SUCCESSFUL ->
+                        kafkaProducer.sendMessagePaymentSuccessful(outBox.getValue());
+                case BaseOutBoxConstants.Type.ORDER_PAYMENT_FAILURE ->
+                        kafkaProducer.sendMessagePaymentFailure(outBox.getValue());
+            }
+
+            outBox.setStatus(BaseOutBoxConstants.Status.COMPLETION);
+        } catch (Exception e) {
+            log.error("[SEND_OUTBOX_MESSAGE_ERROR] - refId: {}, type: {}", outBox.getRefId(), outBox.getType(), e);
+            outBox.setStatus(BaseOutBoxConstants.Status.FAILED);
+            outBox.setError(e.getMessage());
+        }
     }
 }
