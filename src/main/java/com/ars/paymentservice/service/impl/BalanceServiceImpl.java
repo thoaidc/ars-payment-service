@@ -55,7 +55,7 @@ public class BalanceServiceImpl implements BalanceService {
     public BaseResponseDTO getBalanceForAdmin() {
         Common.getUserWithAuthorities();
         Integer balanceType = BasePaymentConstants.BalanceType.SYSTEM;
-        Integer refId = PaymentConstants.SYSTEM_ACCOUNT_ID;
+        Integer refId = BasePaymentConstants.SYSTEM_ACCOUNT_ID;
         Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, refId);
         Balance balance = balanceOptional.orElse(null);
 
@@ -75,22 +75,22 @@ public class BalanceServiceImpl implements BalanceService {
     public void updateBalanceAmount(ChangeBalanceAmountEvent changeBalanceAmountEvent) {
         PaymentHistory paymentHistory = new PaymentHistory();
         paymentHistory.setRefId(changeBalanceAmountEvent.getRefId());
+        paymentHistory.setUserId(changeBalanceAmountEvent.getSenderId());
         paymentHistory.setReceiverId(changeBalanceAmountEvent.getReceiverId());
-        paymentHistory.setUserId(PaymentConstants.SYSTEM_ACCOUNT_ID);
-        paymentHistory.setPaymentGatewayId(0);
-        paymentHistory.setPaymentMethod(PaymentConstants.Service.SYSTEM);
         paymentHistory.setAmount(changeBalanceAmountEvent.getAmount());
-        paymentHistory.setStatus(PaymentConstants.Status.SUCCESS);
+        paymentHistory.setPaymentMethod(PaymentConstants.Service.SYSTEM);
+        paymentHistory.setPaymentGatewayId(BasePaymentConstants.SYSTEM_ACCOUNT_ID);
         paymentHistory.setDescription(changeBalanceAmountEvent.getDescription());
-        paymentHistory.setPaymentTime(Instant.now());
+        paymentHistory.setStatus(PaymentConstants.Status.SUCCESS);
         paymentHistory.setTransId(UUID.randomUUID().toString());
+        paymentHistory.setPaymentTime(Instant.now());
 
         switch (changeBalanceAmountEvent.getType()) {
             case BasePaymentConstants.BalanceType.SYSTEM:
-                paymentHistory.setType(BasePaymentConstants.PaymentType.ADD_TO_SYSTEM_FUNDS);
+                paymentHistory.setType(BasePaymentConstants.PaymentType.SYSTEM_COLLECT_FEE);
                 break;
             case BasePaymentConstants.BalanceType.SHOP:
-                paymentHistory.setType(BasePaymentConstants.PaymentType.ADD_TO_SHOP_BALANCE);
+                paymentHistory.setType(BasePaymentConstants.PaymentType.SYSTEM_PAY_SHOP);
                 break;
         }
 
