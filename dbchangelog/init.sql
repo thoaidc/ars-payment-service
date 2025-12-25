@@ -54,7 +54,7 @@ CREATE TABLE outbox (
     ref_id INT NOT NULL,
     type VARCHAR(100) NOT NULL,
     value VARCHAR(1000) NOT NULL,
-    error VARCHAR(1000) NOT NULL,
+    error VARCHAR(1000),
     status VARCHAR(20) DEFAULT 'PENDING',
     created_by VARCHAR(50),
     last_modified_by VARCHAR(50),

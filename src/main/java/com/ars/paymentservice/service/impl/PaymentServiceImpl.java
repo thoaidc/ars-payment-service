@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -286,6 +287,11 @@ public class PaymentServiceImpl implements PaymentService {
         outBox.setStatus(BaseOutBoxConstants.Status.PENDING);
         outBox.setValue(JsonUtils.toJsonString(paymentSuccessEvent));
         outBoxRepository.save(outBox);
+        MessageDTO messageDTO = MessageDTO.builder()
+                .topic(PaymentConstants.TOPIC_PAYMENT_COMPLETION_NOTIFICATION + paymentHistory.getUserId())
+                .content(HttpStatus.OK.name())
+                .build();
+        notificationServiceClient.sendSocketNotification(messageDTO);
     }
 
     private void cancelOrder(PaymentHistory paymentHistory) {
@@ -300,6 +306,11 @@ public class PaymentServiceImpl implements PaymentService {
         outBox.setStatus(BaseOutBoxConstants.Status.PENDING);
         outBox.setValue(JsonUtils.toJsonString(paymentFailureEvent));
         outBoxRepository.save(outBox);
+        MessageDTO messageDTO = MessageDTO.builder()
+                .topic(PaymentConstants.TOPIC_PAYMENT_COMPLETION_NOTIFICATION + paymentHistory.getUserId())
+                .content(paymentHistory.getError())
+                .build();
+        notificationServiceClient.sendSocketNotification(messageDTO);
     }
 
     @Override
