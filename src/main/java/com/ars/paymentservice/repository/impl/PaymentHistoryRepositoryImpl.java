@@ -74,7 +74,7 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
         """;
 
         Map<String, Object> params = new HashMap<>();
-        StringBuilder whereConditions = new StringBuilder(SqlUtils.WHERE_DEFAULT);
+        StringBuilder whereConditions = new StringBuilder();
         SqlUtils.addDateTimeCondition(whereConditions, params, request, "payment_time");
         StringBuilder sql = new StringBuilder(querySql);
         params.put("shopId", shopId);
@@ -114,7 +114,7 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
         """;
 
         Map<String, Object> params = new HashMap<>();
-        StringBuilder whereConditions = new StringBuilder(SqlUtils.WHERE_DEFAULT);
+        StringBuilder whereConditions = new StringBuilder();
         StringBuilder sql = new StringBuilder(querySql);
         SqlUtils.addDateTimeCondition(whereConditions, params, request, "payment_time");
         sql.append(revenueQuery).append(whereConditions);

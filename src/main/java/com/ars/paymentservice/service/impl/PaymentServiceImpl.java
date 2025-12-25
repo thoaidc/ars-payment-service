@@ -146,9 +146,9 @@ public class PaymentServiceImpl implements PaymentService {
         Optional<FinanceStatisticDTO> financeStatisticDTO;
 
         if (forAdmin) {
-            financeStatisticDTO = paymentHistoryRepository.getFinanceStatisticForShop(userDTO.getShopId(), requestDTO);
-        } else {
             financeStatisticDTO = paymentHistoryRepository.getFinanceStatisticForAdmin(requestDTO);
+        } else {
+            financeStatisticDTO = paymentHistoryRepository.getFinanceStatisticForShop(userDTO.getShopId(), requestDTO);
         }
 
         return BaseResponseDTO.builder().ok(financeStatisticDTO.orElseGet(FinanceStatisticDTO::new));
