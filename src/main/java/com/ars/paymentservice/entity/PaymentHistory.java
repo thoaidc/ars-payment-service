@@ -1,5 +1,6 @@
 package com.ars.paymentservice.entity;
 
+import com.ars.paymentservice.dto.response.FinanceStatisticDTO;
 import com.ars.paymentservice.dto.response.PaymentHistoryDTO;
 import com.dct.config.entity.AbstractAuditingEntity;
 import jakarta.persistence.Column;
@@ -11,6 +12,7 @@ import jakarta.persistence.SqlResultSetMappings;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 
 @Entity
@@ -34,6 +36,19 @@ import java.time.Instant;
                         @ColumnResult(name = "description", type = String.class),
                         @ColumnResult(name = "paymentMethod", type = String.class),
                         @ColumnResult(name = "paymentTime", type = Instant.class)
+                    }
+                )
+            }
+        ),
+        @SqlResultSetMapping(
+            name = "getFinanceStatistic",
+            classes = {
+                @ConstructorResult(
+                    targetClass = FinanceStatisticDTO.class,
+                    columns = {
+                        @ColumnResult(name = "totalRevenue", type = BigInteger.class),
+                        @ColumnResult(name = "totalPlatformFee", type = BigInteger.class),
+                        @ColumnResult(name = "totalProfit", type = BigInteger.class)
                     }
                 )
             }

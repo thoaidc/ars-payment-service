@@ -1,11 +1,11 @@
 package com.ars.paymentservice.repository.impl;
 
 import com.ars.paymentservice.dto.request.SearchPaymentHistoriesRequestDTO;
+import com.ars.paymentservice.dto.response.FinanceStatisticDTO;
 import com.ars.paymentservice.dto.response.PaymentHistoryDTO;
 import com.ars.paymentservice.repository.PaymentHistoryRepositoryCustom;
 import com.dct.config.common.SqlUtils;
 import com.dct.model.dto.request.BaseRequestDTO;
-import com.dct.model.dto.response.BaseResponseDTO;
 
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCustom {
@@ -47,12 +48,82 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
     }
 
     @Override
-    public BaseResponseDTO getFinanceStatisticForShop(Integer shopId, BaseRequestDTO requestDTO) {
-        return null;
+    public Optional<FinanceStatisticDTO> getFinanceStatisticForShop(Integer shopId, BaseRequestDTO request) {
+        String revenueQuery = """
+            SELECT
+                amount AS revenue,
+                0 AS platformFee
+            FROM payment_history
+            WHERE type = 2 AND receiver_id = :shopId AND status = 'SUCCESS'
+        """;
+
+        String platformFeeQuery = """
+            SELECT
+                0 AS revenue,
+                amount AS platformFee
+            FROM payment_history
+            WHERE type = 3 AND user_id = :shopId AND status = 'SUCCESS'
+        """;
+
+        String querySql = """
+            SELECT
+                SUM(TempTable.revenue) AS totalRevenue,
+                SUM(TempTable.platformFee) AS totalPlatformFee,
+                SUM(TempTable.revenue - TempTable.platformFee) AS totalProfit
+            FROM (
+        """;
+
+        Map<String, Object> params = new HashMap<>();
+        StringBuilder whereConditions = new StringBuilder(SqlUtils.WHERE_DEFAULT);
+        SqlUtils.addDateTimeCondition(whereConditions, params, request, "payment_time");
+        StringBuilder sql = new StringBuilder(querySql);
+        params.put("shopId", shopId);
+        sql.append(revenueQuery).append(whereConditions);
+        sql.append(" UNION ALL ");
+        sql.append(platformFeeQuery).append(whereConditions);
+        sql.append(" ) AS TempTable ");
+        return SqlUtils.queryBuilder(entityManager)
+                .querySql(sql.toString())
+                .params(params)
+                .getSingleResult("getFinanceStatistic");
     }
 
     @Override
-    public BaseResponseDTO getFinanceStatisticForAdmin(BaseRequestDTO requestDTO) {
-        return null;
+    public Optional<FinanceStatisticDTO> getFinanceStatisticForAdmin(BaseRequestDTO request) {
+        String revenueQuery = """
+            SELECT
+                amount AS revenue,
+                0 AS platformFee
+            FROM payment_history
+            WHERE type = 1 AND receiver_id = 0 AND status = 'SUCCESS'
+        """;
+
+        String platformFeeQuery = """
+            SELECT
+                0 AS revenue,
+                amount AS platformFee
+            FROM payment_history
+            WHERE type = 3 AND user_id = 0 AND status = 'SUCCESS'
+        """;
+
+        String querySql = """
+            SELECT
+                SUM(TempTable.revenue) AS totalRevenue,
+                SUM(TempTable.platformFee) AS totalProfit
+            FROM (
+        """;
+
+        Map<String, Object> params = new HashMap<>();
+        StringBuilder whereConditions = new StringBuilder(SqlUtils.WHERE_DEFAULT);
+        StringBuilder sql = new StringBuilder(querySql);
+        SqlUtils.addDateTimeCondition(whereConditions, params, request, "payment_time");
+        sql.append(revenueQuery).append(whereConditions);
+        sql.append(" UNION ALL ");
+        sql.append(platformFeeQuery).append(whereConditions);
+        sql.append(" ) AS TempTable ");
+        return SqlUtils.queryBuilder(entityManager)
+                .querySql(sql.toString())
+                .params(params)
+                .getSingleResult("getFinanceStatistic");
     }
 }

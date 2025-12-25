@@ -8,6 +8,7 @@ import com.ars.paymentservice.dto.mapping.RevenueDataMapping;
 import com.ars.paymentservice.dto.request.MessageDTO;
 import com.ars.paymentservice.dto.request.PaymentRequestDTO;
 import com.ars.paymentservice.dto.request.SearchPaymentHistoriesRequestDTO;
+import com.ars.paymentservice.dto.response.FinanceStatisticDTO;
 import com.ars.paymentservice.dto.response.PayOSPaymentInfo;
 import com.ars.paymentservice.dto.response.PaymentHistoryDTO;
 import com.ars.paymentservice.entity.OutBox;
@@ -142,12 +143,15 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public BaseResponseDTO getFinanceStatistic(BaseRequestDTO requestDTO, boolean forAdmin) {
         BaseUserDTO userDTO = Common.getUserWithAuthorities();
+        Optional<FinanceStatisticDTO> financeStatisticDTO;
 
         if (forAdmin) {
-            return paymentHistoryRepository.getFinanceStatisticForShop(userDTO.getShopId(), requestDTO);
+            financeStatisticDTO = paymentHistoryRepository.getFinanceStatisticForShop(userDTO.getShopId(), requestDTO);
         } else {
-            return paymentHistoryRepository.getFinanceStatisticForAdmin(requestDTO);
+            financeStatisticDTO = paymentHistoryRepository.getFinanceStatisticForAdmin(requestDTO);
         }
+
+        return BaseResponseDTO.builder().ok(financeStatisticDTO.orElseGet(FinanceStatisticDTO::new));
     }
 
     @Override
