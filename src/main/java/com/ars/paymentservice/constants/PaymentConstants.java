@@ -14,4 +14,5 @@ public interface PaymentConstants {
     }
 
     int DEFAULT_PAYMENT_EXPIRED_DURATION = 5; // 5 minutes
+    String TOPIC_PAYMENT_NOTIFICATION = "payment_notification_";
 }

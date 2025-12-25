@@ -1,9 +1,11 @@
 package com.ars.paymentservice.service.impl;
 
+import com.ars.paymentservice.client.NotificationServiceClient;
 import com.ars.paymentservice.constants.PayOSConstants;
 import com.ars.paymentservice.constants.PaymentConstants;
 import com.ars.paymentservice.dto.mapping.PaymentGatewayResponse;
 import com.ars.paymentservice.dto.mapping.RevenueDataMapping;
+import com.ars.paymentservice.dto.request.MessageDTO;
 import com.ars.paymentservice.dto.request.PaymentRequestDTO;
 import com.ars.paymentservice.dto.request.SearchPaymentHistoriesRequestDTO;
 import com.ars.paymentservice.dto.response.PayOSPaymentInfo;
@@ -52,16 +54,19 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentGatewayRepository paymentGatewayRepository;
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final BankIntegrationFactory bankIntegrationFactory;
+    private final NotificationServiceClient notificationServiceClient;
     private final OutBoxRepository outBoxRepository;
 
     public PaymentServiceImpl(PaymentGatewayRepository paymentGatewayRepository,
                               PaymentHistoryRepository paymentHistoryRepository,
                               BankIntegrationFactory bankIntegrationFactory,
-                              OutBoxRepository outBoxRepository) {
+                              OutBoxRepository outBoxRepository,
+                              NotificationServiceClient notificationServiceClient) {
         this.paymentGatewayRepository = paymentGatewayRepository;
         this.paymentHistoryRepository = paymentHistoryRepository;
         this.bankIntegrationFactory = bankIntegrationFactory;
         this.outBoxRepository = outBoxRepository;
+        this.notificationServiceClient = notificationServiceClient;
     }
 
     @Override
@@ -166,8 +171,14 @@ public class PaymentServiceImpl implements PaymentService {
             paymentHistory.setDescription(paymentRequest.getPaymentContent());
             IBankIntegration bankService = bankIntegrationFactory.getBankIntegration(orderRequest.getPaymentMethod());
             Object paymentInfo = bankService.createPayment(paymentRequest);
-            paymentHistory.setInfo(JsonUtils.toJsonString(paymentInfo));
+            String paymentInfoStr = JsonUtils.toJsonString(paymentInfo);
+            paymentHistory.setInfo(paymentInfoStr);
             paymentHistoryRepository.save(paymentHistory);
+            MessageDTO messageDTO = MessageDTO.builder()
+                    .topic(PaymentConstants.TOPIC_PAYMENT_NOTIFICATION + orderRequest.getUserId())
+                    .content(paymentInfoStr)
+                    .build();
+            notificationServiceClient.sendSocketNotification(messageDTO);
         } catch (Exception e) {
             log.error(
                 "[CREATE_PAYMENT_ERROR] - orderId: {}, userId: {}, paymentMethod: {}, amount: {}. Error: {}",
