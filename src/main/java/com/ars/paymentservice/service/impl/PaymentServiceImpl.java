@@ -183,7 +183,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .topic(PaymentConstants.TOPIC_PAYMENT_NOTIFICATION + orderRequest.getUserId())
                     .content(paymentInfoStr)
                     .build();
-            notificationServiceClient.sendSocketNotification(messageDTO);
+            sendMessage(messageDTO);
         } catch (Exception e) {
             log.error(
                 "[CREATE_PAYMENT_ERROR] - orderId: {}, userId: {}, paymentMethod: {}, amount: {}. Error: {}",
@@ -291,7 +291,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .topic(PaymentConstants.TOPIC_PAYMENT_COMPLETION_NOTIFICATION + paymentHistory.getUserId())
                 .content(HttpStatus.OK.name())
                 .build();
-        notificationServiceClient.sendSocketNotification(messageDTO);
+        sendMessage(messageDTO);
     }
 
     private void cancelOrder(PaymentHistory paymentHistory) {
@@ -310,7 +310,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .topic(PaymentConstants.TOPIC_PAYMENT_COMPLETION_NOTIFICATION + paymentHistory.getUserId())
                 .content(paymentHistory.getError())
                 .build();
-        notificationServiceClient.sendSocketNotification(messageDTO);
+        sendMessage(messageDTO);
     }
 
     @Override
@@ -327,5 +327,13 @@ public class PaymentServiceImpl implements PaymentService {
         outBox.setStatus(BaseOutBoxConstants.Status.PENDING);
         outBox.setValue(JsonUtils.toJsonString(paymentFailureEvent));
         outBoxRepository.save(outBox);
+    }
+
+    private void sendMessage(MessageDTO messageDTO) {
+        try {
+            notificationServiceClient.sendSocketNotification(messageDTO);
+        } catch (Exception e) {
+            log.error("SEND_MESSAGE_ERROR - {}", messageDTO, e);
+        }
     }
 }
