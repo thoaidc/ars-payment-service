@@ -1,6 +1,8 @@
 package com.ars.paymentservice.service.impl;
 
 import com.ars.paymentservice.client.NotificationServiceClient;
+import com.ars.paymentservice.client.ProductServiceClient;
+import com.ars.paymentservice.client.UserServiceClient;
 import com.ars.paymentservice.constants.PayOSConstants;
 import com.ars.paymentservice.constants.PaymentConstants;
 import com.ars.paymentservice.dto.mapping.PaymentGatewayResponse;
@@ -8,9 +10,11 @@ import com.ars.paymentservice.dto.mapping.RevenueDataMapping;
 import com.ars.paymentservice.dto.request.MessageDTO;
 import com.ars.paymentservice.dto.request.PaymentRequestDTO;
 import com.ars.paymentservice.dto.request.SearchPaymentHistoriesRequestDTO;
+import com.ars.paymentservice.dto.request.UserIDRequest;
 import com.ars.paymentservice.dto.response.FinanceStatisticDTO;
 import com.ars.paymentservice.dto.response.PayOSPaymentInfo;
 import com.ars.paymentservice.dto.response.PaymentHistoryDTO;
+import com.ars.paymentservice.dto.response.PaymentHistoryUserDTO;
 import com.ars.paymentservice.entity.OutBox;
 import com.ars.paymentservice.entity.PaymentHistory;
 import com.ars.paymentservice.integration.IBankIntegration;
@@ -34,6 +38,8 @@ import com.dct.model.event.PaymentFailureEvent;
 import com.dct.model.event.PaymentSuccessEvent;
 import com.dct.model.exception.BaseBadRequestException;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -46,8 +52,11 @@ import vn.payos.model.webhooks.WebhookData;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -58,17 +67,23 @@ public class PaymentServiceImpl implements PaymentService {
     private final BankIntegrationFactory bankIntegrationFactory;
     private final NotificationServiceClient notificationServiceClient;
     private final OutBoxRepository outBoxRepository;
+    private final UserServiceClient userServiceClient;
+    private final ProductServiceClient productServiceClient;
+    private final ObjectMapper objectMapper;
 
     public PaymentServiceImpl(PaymentGatewayRepository paymentGatewayRepository,
                               PaymentHistoryRepository paymentHistoryRepository,
                               BankIntegrationFactory bankIntegrationFactory,
                               OutBoxRepository outBoxRepository,
-                              NotificationServiceClient notificationServiceClient) {
+                              NotificationServiceClient notificationServiceClient, UserServiceClient userServiceClient, ProductServiceClient productServiceClient, ObjectMapper objectMapper) {
         this.paymentGatewayRepository = paymentGatewayRepository;
         this.paymentHistoryRepository = paymentHistoryRepository;
         this.bankIntegrationFactory = bankIntegrationFactory;
         this.outBoxRepository = outBoxRepository;
         this.notificationServiceClient = notificationServiceClient;
+        this.userServiceClient = userServiceClient;
+        this.productServiceClient = productServiceClient;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -80,7 +95,38 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public BaseResponseDTO getPaymentHistoriesWithPaging(SearchPaymentHistoriesRequestDTO requestDTO) {
         Page<PaymentHistoryDTO> paymentHistoryPage = paymentHistoryRepository.getAllWithPaging(requestDTO);
-        return BaseResponseDTO.builder().total(paymentHistoryPage.getTotalElements()).ok(paymentHistoryPage.getContent());
+        List<PaymentHistoryDTO> paymentHistories = paymentHistoryPage.getContent();
+        List<Integer> userIds = paymentHistories.stream()
+                .filter(pm -> pm.getType().equals(BasePaymentConstants.PaymentType.CUSTOMER_PAY_ORDER))
+                .map(PaymentHistoryDTO::getUserId)
+                .toList();
+        List<Integer> shopIds = paymentHistories.stream()
+                .filter(pm -> pm.getType().equals(BasePaymentConstants.PaymentType.SYSTEM_COLLECT_FEE))
+                .map(PaymentHistoryDTO::getUserId)
+                .toList();
+        BaseResponseDTO userRes = userServiceClient.getPaymentHistoryUser(new UserIDRequest(userIds));
+        BaseResponseDTO shopRes = productServiceClient.getPaymentHistoryUser(new UserIDRequest(shopIds));
+        TypeReference<List<PaymentHistoryUserDTO>> typeReference = new TypeReference<>() {};
+        List<PaymentHistoryUserDTO> userDTOS = objectMapper.convertValue(userRes.getResult(), typeReference);
+        List<PaymentHistoryUserDTO> shopDTOS = objectMapper.convertValue(shopRes.getResult(), typeReference);
+        Map<Integer, PaymentHistoryUserDTO> userDTOMap = userDTOS.stream().collect(
+            Collectors.toMap(PaymentHistoryUserDTO::getId, Function.identity())
+        );
+        Map<Integer, PaymentHistoryUserDTO> shopDTOMap = shopDTOS.stream().collect(
+            Collectors.toMap(PaymentHistoryUserDTO::getId, Function.identity())
+        );
+        paymentHistories.forEach(pm -> {
+            if (pm.getType().equals(BasePaymentConstants.PaymentType.CUSTOMER_PAY_ORDER)) {
+                PaymentHistoryUserDTO paymentHistoryUserDTO = userDTOMap.get(pm.getUserId());
+                pm.setUsername(paymentHistoryUserDTO.getName());
+            }
+
+            if (pm.getType().equals(BasePaymentConstants.PaymentType.SYSTEM_COLLECT_FEE)) {
+                PaymentHistoryUserDTO paymentHistoryUserDTO = shopDTOMap.get(pm.getUserId());
+                pm.setUsername(paymentHistoryUserDTO.getName());
+            }
+        });
+        return BaseResponseDTO.builder().total(paymentHistoryPage.getTotalElements()).ok(paymentHistories);
     }
 
     @Override
@@ -94,6 +140,26 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentHistory paymentHistory = paymentHistoryOptional.get();
         PaymentHistoryDTO paymentHistoryDTO = new PaymentHistoryDTO();
         BeanUtils.copyProperties(paymentHistory, paymentHistoryDTO);
+        TypeReference<List<PaymentHistoryUserDTO>> typeReference = new TypeReference<>() {};
+        BaseResponseDTO userRes = null;
+
+        if (paymentHistory.getType().equals(BasePaymentConstants.PaymentType.CUSTOMER_PAY_ORDER)) {
+            userRes = userServiceClient.getPaymentHistoryUser(new UserIDRequest(List.of(paymentHistory.getUserId())));
+        }
+
+        if (paymentHistory.getType().equals(BasePaymentConstants.PaymentType.SYSTEM_COLLECT_FEE)) {
+            userRes = productServiceClient.getPaymentHistoryUser(new UserIDRequest(List.of(paymentHistory.getUserId())));
+        }
+
+        if (userRes != null) {
+            List<PaymentHistoryUserDTO> userDTOS = objectMapper.convertValue(userRes.getResult(), typeReference);
+            Map<Integer, PaymentHistoryUserDTO> userDTOMap = userDTOS.stream().collect(
+                    Collectors.toMap(PaymentHistoryUserDTO::getId, Function.identity())
+            );
+            PaymentHistoryUserDTO paymentHistoryUserDTO = userDTOMap.get(paymentHistory.getUserId());
+            paymentHistoryDTO.setUsername(paymentHistoryUserDTO.getName());
+        }
+
         return BaseResponseDTO.builder().ok(paymentHistoryDTO);
     }
 
