@@ -11,9 +11,9 @@ public interface PaymentService {
     BaseResponseDTO getPaymentHistoriesWithPaging(SearchPaymentHistoriesRequestDTO requestDTO);
     BaseResponseDTO getPaymentHistoryDetail(Integer paymentHistoryId);
     BaseResponseDTO getPaymentInfo(Integer orderId);
-    BaseResponseDTO getRevenueLastSevenDay(Integer type, Integer receiverId);
+    BaseResponseDTO getRevenueLastSevenDayForShop(Integer receiverId);
     BaseResponseDTO getRevenueLastSevenDayForAdmin();
-    BaseResponseDTO getRevenueToDay(Integer type, Integer receiverId);
+    BaseResponseDTO getRevenueToDayForShop(Integer receiverId);
     BaseResponseDTO getRevenueToDayForAdmin();
     BaseResponseDTO getFinanceStatistic(BaseRequestDTO requestDTO, boolean forAdmin);
     void createPayment(OrderCreatedEvent orderCreatedEvent);

@@ -36,6 +36,11 @@ public class BalanceServiceImpl implements BalanceService {
     @Transactional
     public BaseResponseDTO getBalanceForShop() {
         BaseUserDTO userDTO = Common.getUserWithAuthorities();
+
+        if (Objects.isNull(userDTO.getShopId())) {
+            return BaseResponseDTO.builder().ok();
+        }
+
         Integer balanceType = BasePaymentConstants.BalanceType.SHOP;
         Optional<Balance> balanceOptional = balanceRepository.findByTypeAndRefId(balanceType, userDTO.getShopId());
         Balance balance = balanceOptional.orElseGet(Balance::new);

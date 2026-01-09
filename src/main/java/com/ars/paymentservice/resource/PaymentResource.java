@@ -36,13 +36,13 @@ public class PaymentResource {
     }
 
     @GetMapping("/v1/payments/revenues/last-seven-day")
-    public BaseResponseDTO getRevenueLastSevenDay(@RequestParam Integer type, @RequestParam Integer receiverId) {
-        return paymentService.getRevenueLastSevenDay(type, receiverId);
+    public BaseResponseDTO getRevenueLastSevenDay(@RequestParam Integer receiverId) {
+        return paymentService.getRevenueLastSevenDayForShop(receiverId);
     }
 
     @GetMapping("/v1/payments/revenues/today")
-    public BaseResponseDTO getRevenueToDay(@RequestParam Integer type, @RequestParam Integer receiverId) {
-        return paymentService.getRevenueToDay(type, receiverId);
+    public BaseResponseDTO getRevenueToDayForShop(@RequestParam Integer receiverId) {
+        return paymentService.getRevenueToDayForShop(receiverId);
     }
 
     @GetMapping("/v1/payments/revenues/admin/last-seven-day")

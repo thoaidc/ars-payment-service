@@ -110,34 +110,28 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public BaseResponseDTO getRevenueLastSevenDay(Integer type, Integer receiverId) {
-        List<RevenueDataMapping> revenueDataMappings = paymentHistoryRepository.getRevenueLastSevenDay(type, receiverId);
+    public BaseResponseDTO getRevenueLastSevenDayForShop(Integer receiverId) {
+        List<RevenueDataMapping> revenueDataMappings = paymentHistoryRepository.getRevenueLastSevenDay(receiverId);
         return BaseResponseDTO.builder().ok(revenueDataMappings);
     }
 
     @Override
     public BaseResponseDTO getRevenueLastSevenDayForAdmin() {
         Common.checkShopAuthorities(BasePaymentConstants.SYSTEM_ACCOUNT_ID);
-        List<RevenueDataMapping> revenueDataMappings = paymentHistoryRepository.getRevenueLastSevenDay(
-            BasePaymentConstants.PaymentType.CUSTOMER_PAY_ORDER,
-            BasePaymentConstants.SYSTEM_ACCOUNT_ID
-        );
+        List<RevenueDataMapping> revenueDataMappings = paymentHistoryRepository.getRevenueLastSevenDayForAdmin();
         return BaseResponseDTO.builder().ok(revenueDataMappings);
     }
 
     @Override
-    public BaseResponseDTO getRevenueToDay(Integer type, Integer receiverId) {
-        BigDecimal revenueToday = paymentHistoryRepository.getRevenueToDay(type, receiverId);
+    public BaseResponseDTO getRevenueToDayForShop(Integer receiverId) {
+        BigDecimal revenueToday = paymentHistoryRepository.getRevenueToDayForShop(receiverId);
         return BaseResponseDTO.builder().ok(Optional.ofNullable(revenueToday).orElse(BigDecimal.ZERO));
     }
 
     @Override
     public BaseResponseDTO getRevenueToDayForAdmin() {
         Common.checkShopAuthorities(BasePaymentConstants.SYSTEM_ACCOUNT_ID);
-        BigDecimal revenueToday = paymentHistoryRepository.getRevenueToDay(
-            BasePaymentConstants.PaymentType.CUSTOMER_PAY_ORDER,
-            BasePaymentConstants.SYSTEM_ACCOUNT_ID
-        );
+        BigDecimal revenueToday = paymentHistoryRepository.getRevenueToDayForAdmin();
         return BaseResponseDTO.builder().ok(Optional.ofNullable(revenueToday).orElse(BigDecimal.ZERO));
     }
 

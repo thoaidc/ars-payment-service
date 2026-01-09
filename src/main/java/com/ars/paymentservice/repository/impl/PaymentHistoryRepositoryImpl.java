@@ -49,9 +49,9 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
 
     @Override
     public Optional<FinanceStatisticDTO> getFinanceStatisticForShop(Integer shopId, BaseRequestDTO request) {
-        String revenueQuery = """
+        String profitQuery = """
             SELECT
-                amount AS revenue,
+                amount AS profit,
                 0 AS platformFee
             FROM payment_history
             WHERE type = 2 AND receiver_id = :shopId AND status = 'SUCCESS'
@@ -59,7 +59,7 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
 
         String platformFeeQuery = """
             SELECT
-                0 AS revenue,
+                0 AS profit,
                 amount AS platformFee
             FROM payment_history
             WHERE type = 3 AND user_id = :shopId AND status = 'SUCCESS'
@@ -67,9 +67,9 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
 
         String querySql = """
             SELECT
-                SUM(TempTable.revenue) AS totalRevenue,
+                SUM(TempTable.profit) AS totalProfit,
                 SUM(TempTable.platformFee) AS totalPlatformFee,
-                SUM(TempTable.revenue - TempTable.platformFee) AS totalProfit
+                SUM(TempTable.profit + TempTable.platformFee) AS totalRevenue
             FROM (
         """;
 
@@ -78,7 +78,7 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
         SqlUtils.addDateTimeCondition(whereConditions, params, request, "payment_time");
         StringBuilder sql = new StringBuilder(querySql);
         params.put("shopId", shopId);
-        sql.append(revenueQuery).append(whereConditions);
+        sql.append(profitQuery).append(whereConditions);
         sql.append(" UNION ALL ");
         sql.append(platformFeeQuery).append(whereConditions);
         sql.append(" ) AS TempTable ");
