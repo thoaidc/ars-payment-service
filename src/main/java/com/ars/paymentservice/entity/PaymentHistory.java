@@ -12,7 +12,6 @@ import jakarta.persistence.SqlResultSetMappings;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.Instant;
 
 @Entity
@@ -46,9 +45,9 @@ import java.time.Instant;
                 @ConstructorResult(
                     targetClass = FinanceStatisticDTO.class,
                     columns = {
-                        @ColumnResult(name = "totalRevenue", type = BigInteger.class),
-                        @ColumnResult(name = "totalPlatformFee", type = BigInteger.class),
-                        @ColumnResult(name = "totalProfit", type = BigInteger.class)
+                        @ColumnResult(name = "totalRevenue", type = BigDecimal.class),
+                        @ColumnResult(name = "totalPlatformFee", type = BigDecimal.class),
+                        @ColumnResult(name = "totalProfit", type = BigDecimal.class)
                     }
                 )
             }
