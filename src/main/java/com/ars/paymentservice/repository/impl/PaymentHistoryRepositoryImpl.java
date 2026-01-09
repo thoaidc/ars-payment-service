@@ -103,7 +103,7 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
                 0 AS revenue,
                 amount AS platformFee
             FROM payment_history
-            WHERE type = 3 AND user_id = 0 AND status = 'SUCCESS'
+            WHERE type = 3 AND receiver_id = 0 AND status = 'SUCCESS'
         """;
 
         String querySql = """
@@ -124,6 +124,6 @@ public class PaymentHistoryRepositoryImpl implements PaymentHistoryRepositoryCus
         return SqlUtils.queryBuilder(entityManager)
                 .querySql(sql.toString())
                 .params(params)
-                .getSingleResult("getFinanceStatistic");
+                .getSingleResult("getFinanceStatisticAdmin");
     }
 }

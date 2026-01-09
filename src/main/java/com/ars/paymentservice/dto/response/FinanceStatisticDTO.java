@@ -9,6 +9,11 @@ public class FinanceStatisticDTO {
 
     public FinanceStatisticDTO() {}
 
+    public FinanceStatisticDTO(BigDecimal totalRevenue, BigDecimal totalProfit) {
+        this.totalRevenue = totalRevenue;
+        this.totalProfit = totalProfit;
+    }
+
     public FinanceStatisticDTO(BigDecimal totalRevenue, BigDecimal totalPlatformFee, BigDecimal totalProfit) {
         this.totalRevenue = totalRevenue;
         this.totalPlatformFee = totalPlatformFee;

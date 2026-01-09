@@ -51,6 +51,18 @@ import java.time.Instant;
                     }
                 )
             }
+        ),
+        @SqlResultSetMapping(
+            name = "getFinanceStatisticAdmin",
+            classes = {
+                @ConstructorResult(
+                    targetClass = FinanceStatisticDTO.class,
+                    columns = {
+                        @ColumnResult(name = "totalRevenue", type = BigDecimal.class),
+                        @ColumnResult(name = "totalProfit", type = BigDecimal.class)
+                    }
+                )
+            }
         )
     }
 )
